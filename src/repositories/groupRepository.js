@@ -113,24 +113,40 @@ async function getUsersOfGroups(groupId) {
 
 // Implement this method body for challenge 11
 async function addNewProject(projectDetails) {
-  const { projectName, projectDescription, currentDate, endDate, userId, selectedUserGroupId, status } = projectDetails;
-  
-  return new Promise((resolve, reject) => {
-    knex_db
-      .raw(
-        `
+    const {
+        projectName,
+        projectDescription,
+        currentDate,
+        endDate,
+        userId,
+        selectedUserGroupId,
+        status,
+    } = projectDetails;
+
+    return new Promise((resolve, reject) => {
+        knex_db
+            .raw(
+                `
         INSERT INTO projects (name, description, createdDate, dueDate, ownerId, groupId, projectStatus)
         VALUES (?, ?, ?, ?, ?, ?, ?)
         `,
-        [projectName, projectDescription, currentDate, endDate, userId, selectedUserGroupId, status]
-      )
-      .then((result) => {
-        resolve('success');
-      })
-      .catch((error) => {
-        reject(error);
-      });
-  });
+                [
+                    projectName,
+                    projectDescription,
+                    currentDate,
+                    endDate,
+                    userId,
+                    selectedUserGroupId,
+                    status,
+                ]
+            )
+            .then((result) => {
+                resolve("success");
+            })
+            .catch((error) => {
+                reject(error);
+            });
+    });
 }
 
 // Implement this method body for challenge 12
@@ -139,29 +155,42 @@ async function addNewTask(taskDetails) {}
 // Implement this method for challenge 13
 async function updateProject(details, projectId) {
     const { projectName, projectDescription, endDate } = details;
-  
+
     return new Promise((resolve, reject) => {
-      knex_db("projects")
-        .where({ id: projectId })
-        .update({
-          name: projectName,
-          description: projectDescription,
-          dueDate: endDate,
-        })
-        .then(() => {
-          resolve("success");
-        })
-        .catch((error) => {
-          reject(error);
-        });
+        knex_db("projects")
+            .where({ id: projectId })
+            .update({
+                name: projectName,
+                description: projectDescription,
+                dueDate: endDate,
+            })
+            .then(() => {
+                resolve("success");
+            })
+            .catch((error) => {
+                reject(error);
+            });
     });
-  }
+}
 
 // Implement this method for challenge 14
 async function updateTask(details, taskId) {}
 
 // Implement this method for challenge 15
-async function updateProjectStatus(projectId, status) {}
+async function updateProjectStatus(projectId, data) {
+    const { status } = data;
+    return new Promise((resolve, reject) => {
+        knex_db("projects")
+            .where("id", projectId)
+            .update("projectStatus", status)
+            .then(() => {
+                resolve("success");
+            })
+            .catch((error) => {
+                reject(error);
+            });
+    });
+}
 
 // Implement this method for challenge 16
 async function updateTaskStatus(taskId, status) {}
