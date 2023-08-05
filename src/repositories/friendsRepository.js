@@ -96,11 +96,11 @@ async function sendReq(data) {
                             } else {
                                 knex_db
                                     .raw(
-                                        "UPDATE friends SET status = 'PENDING' WHERE id = ?",
-                                        [1]
+                                        "INSERT INTO friends (sender_id, recipient_id, status) VALUES (?, ?, ?)",
+                                        [sender_id, recipient_id, status]
                                     )
                                     .then(() => {
-                                        resolve("");
+                                        resolve("success");
                                     })
                                     .catch((error) => {
                                         reject(error);
@@ -117,23 +117,56 @@ async function sendReq(data) {
 
 //Update this method to view the users to whom the requests were sent and complete challenge3.d
 async function viewSentReqs(id) {
-    let reqSentUsers = [];
-    return reqSentUsers;
+    try {
+        let reqSentUsers = [];
+
+        const reqsSent = await knex_db("friends")
+            .select("id", "status", "sender_id", "recipient_id")
+            .where("sender_id", id)
+            .andWhere("status", "PENDING");
+
+        for (const req of reqsSent) {
+            const userSender = await userRepository.getUser(req.recipient_id);
+            userSender.reqId = req.id;
+            reqSentUsers.push(userSender);
+        }
+
+        return reqSentUsers;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
 }
 
 //Update this method to view the users whose the requests were received and complete challenge3.e
 async function viewPendingReqs(id) {
-    let reqReceivedUsers = [];
-    return reqReceivedUsers;
+    try {
+        let reqReceivedUsers = [];
+        const reqsReceived = await knex_db("friends")
+            .select("id", "status", "sender_id", "recipient_id")
+            .where("recipient_id", id)
+            .andWhere("status", "PENDING");
+
+        for (const req of reqsReceived) {
+            const reqReceiving = await userRepository.getUser(req.sender_id);
+            reqReceiving.reqId = req.id;
+            reqReceivedUsers.push(reqReceiving);
+        }
+        return reqReceivedUsers;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
 }
 
 //Update this method to complete the challenge3.f
 async function acceptReq(id) {
     return new Promise((resolve, reject) => {
         knex_db
-            .raw("UPDATE friends SET status = 'PENDING' WHERE id = ?", [1])
+            .raw("UPDATE friends SET status = 'ACCEPTED' WHERE id = ?", [id])
             .then(() => {
-                resolve("");
+                resolve("success");
+                console.log(id);
             })
             .catch((error) => {
                 reject(error);
@@ -152,11 +185,12 @@ async function rejectReq(id) {
                     return;
                 }
                 knex_db
-                    .raw("UPDATE friends SET status = 'PENDING' WHERE id = ?", [
-                        1,
-                    ])
+                    .raw(
+                        "DELETE FROM friends WHERE status = 'PENDING' AND id = ?",
+                        [id]
+                    )
                     .then(() => {
-                        resolve("");
+                        resolve("Request deleted successfully!");
                     })
                     .catch((error) => {
                         console.error(error);
@@ -179,7 +213,6 @@ async function viewFriends(id) {
                 this.where("sender_id", id).orWhere("recipient_id", id);
             })
             .andWhere({ status: "ACCEPTED" });
-        console.log(friendsAccepted);
 
         for (const friend of friendsAccepted) {
             const { sender_id, recipient_id } = friend;
@@ -187,11 +220,11 @@ async function viewFriends(id) {
                 const friendDetails = await userRepository.getUser(
                     recipient_id
                 );
-                friendDetails.reqID = friend.id;
+                friendDetails.reqId = friend.id;
                 friends.push(friendDetails);
             } else if (id !== sender_id) {
                 const friendDetails = await userRepository.getUser(sender_id);
-                friendDetails.reqID = friend.id;
+                friendDetails.reqId = friend.id;
                 friends.push(friendDetails);
             }
         }
