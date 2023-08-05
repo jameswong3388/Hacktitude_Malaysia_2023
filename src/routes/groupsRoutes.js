@@ -62,7 +62,7 @@ router.put("/:taskId/updateTask", async (req, res) => {
 
 router.get('/:projectId/project', async (req, res) => {
     const projectId = req.params.projectId;
-    const project = await groupService.getProjectByIdReq(projectId);
+    const response = await groupService.getProjectByIdReq(projectId);
     res.json(project);
 });
 
@@ -75,12 +75,13 @@ router.get('/:projectId/project', async (req, res) => {
 //
 
 // Implement the route method for updateTaskStatus in challenge 16 here
-//
-//
-//
-//
-//
-//
+router.put('/:taskId/updateTaskStatus', async (req, res) => {
+    const taskId = req.params.taskId;
+    const status = req.body.status;
+    const response = await groupService.updateTaskStatusReq(taskId, status);
+    res.json(response);
+});
+
 
 router.post("/addNewProject", async (req, res) => {
     const data = req.body;

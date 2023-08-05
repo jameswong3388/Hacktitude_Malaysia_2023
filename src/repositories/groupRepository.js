@@ -158,17 +158,12 @@ async function updateProject(details, projectId) {
   }
 
 // Implement this method for challenge 14
-async function updateTask(details, taskId) {
-    const { taskName, taskDescription, endDate, assignee } = details
-  
+async function updateTask(taskId, status) {
     return new Promise((resolve, reject) => {
       knex_db("tasks")
         .where({ id: taskId })
         .update({
-          name: taskName,
-          description: taskDescription,
-          dueDate: endDate,
-          assigneeId: assignee
+          projectStatus: status,
         })
         .then(() => {
           resolve("success");
