@@ -84,24 +84,33 @@ async function addNewTaskReq(taskDetails) {
   return { response: response, status: httpStatus.OK };
 }
 // Implement this method for Challenge 5
-// async function getGroupsFromKeyword(keyword) {
+async function getGroupsFromKeyword(keyword) {
+  const response = await groupRepository.getGroupsFromKeyword(keyword);
 
-// }
+  if (response ) {
+    return { response: response, statusbar: httpStatus.OK }
+  } else {
+    return { response: [], statusbar: httpStatus.OK }
+  }
+}
 
 // Implement this method for Challenge 5
-// async function addNewGroup(data) {
-
-// }
-
-// Implement this method for Challenge 6
-// async function addUserToGroup(data) {
-
-// }
+async function addNewGroup(data) {
+  const response = await groupRepository.addNewGroup(data);
+  return { response: response, status: httpStatus.OK };
+}
 
 // Implement this method for Challenge 6
-// async function getGroupsFromUser(user_id) {
-  
-// }
+async function addUserToGroup(data) {
+  const response = await groupRepository.addUserToGroup(data);
+  return { response: response, status: httpStatus.OK };
+}
+
+// Implement this method for Challenge 6
+async function getGroupsFromUser(user_id) {
+  const response = await groupRepository.getGroupsFromUser(user_id);
+  return { response: response, status: httpStatus.OK };
+}
 
 initializeApp();
 
@@ -113,6 +122,10 @@ export default {
   getTasksOfProjectReq,
   getUsersOfGroupsReq,
   getProjectByIdReq,
+  getGroupsFromKeyword,
+  getGroupsFromUser,
   addNewProjectReq,
   addNewTaskReq,
+  addNewGroup,
+  addUserToGroup,
 };

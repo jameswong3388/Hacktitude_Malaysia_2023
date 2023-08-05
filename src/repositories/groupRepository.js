@@ -1,3 +1,4 @@
+
 import Group from "../models/group.js";
 import HttpStatus from "../enums/httpStatus.js";
 import knex_db from "../../db/db-config.js";
@@ -135,18 +136,78 @@ async function getProjectById(projectId) {
 
 // Implement this method for Challenge 5
 async function getGroupsFromKeyword(keyword) {
+  return new Promise((resolve, reject) => {
+    knex_db
+      .select('*')
+      .from('projects')
+      .where('name', 'LIKE', `%${keyword}%`)
+      .then((result) => {
+        const project = result;
+        resolve(project);
+      })
+      .catch((error) => {
+        reject(error);
+      });
+  });
 }
 
 // Implement this method for Challenge 5
 async function addNewGroup(data) {
+  return new Promise((resolve, reject) => {
+    knex_db('groups')
+      .insert({
+        name: data.group_name,
+        description: data.group_desc,
+        hobbies: `[${data.group_name}]`,
+        capacity: Math.floor(Math.random() * 101),
+      })
+      .returning('id')
+      .then((result) => {
+        resolve({ message: 'New group added successfully.', id: result[0]});
+      })
+      .catch((error) => {
+        reject(error);
+      });
+  });
 }
 
 // Implement this method for Challenge 6
 async function addUserToGroup(data) {
+  return new Promise((resolve, reject) => {
+    knex_db('userGroups')
+      .insert({
+        group_id: data.group_id,
+        user_id: data.user_id,
+      })
+      .then((result) => {
+        resolve({ message: 'User add to group successfully.'});
+      })
+      .catch((error) => {
+        reject(error);
+      });
+  });
 }
 
 // Implement this method for challenge 6
 async function getGroupsFromUser(userId) {
+  return new Promise((resolve, reject) => {
+    knex_db('userGroups')
+      .where('user_id', userId)
+      .then((userGroups) => {
+        // Extract groupIds from userGroups
+        const groupIds = userGroups.map(userGroup => userGroup.group_id);
+
+        // Fetch groups with matching groupIds
+        return knex_db('groups')
+          .whereIn('id', groupIds);
+      })
+      .then((groups) => {
+        resolve(groups);
+      })
+      .catch((error) => {
+        reject(error);
+      });
+  });
 }
 
 function parseGroupsData(data) {
