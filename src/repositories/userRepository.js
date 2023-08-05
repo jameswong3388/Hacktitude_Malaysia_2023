@@ -11,7 +11,56 @@ function init(db) {
 
 // Update this method to get all users method in challenge1.a
 async function getUsers() {
-    return [];
+  try {
+    const users = await knex_db('users')
+      .select(
+        'users.id',
+        'users.email',
+        'users.gender',
+        'users.firstname',
+        'users.lastname',
+        'users.image_url',
+        knex_db.raw('GROUP_CONCAT(DISTINCT hobbies.name) as hobbies'),
+        knex_db.raw('GROUP_CONCAT(DISTINCT hobbies.rate) as hobby_rates'),
+        knex_db.raw('GROUP_CONCAT(DISTINCT skills.name) as skills'),
+        knex_db.raw('GROUP_CONCAT(DISTINCT skills.rate) as skill_rates')
+      )
+      .leftJoin('hobbies', 'users.id', 'hobbies.userId')
+      .leftJoin('skills', 'users.id', 'skills.userId')
+      .groupBy('users.id');
+
+    // Organize the data into the desired format
+    const usersWithHobbiesAndSkills = users.map((user) => {
+      const hobbies = user.hobbies
+        ? user.hobbies.split(',').map((hobby, index) => ({
+            name: hobby,
+            rate: parseInt(user.hobby_rates.split(',')[index]),
+          }))
+        : [];
+      const skills = user.skills
+        ? user.skills.split(',').map((skill, index) => ({
+            name: skill,
+            rate: parseInt(user.skill_rates.split(',')[index]),
+          }))
+        : [];
+
+      return {
+        id: user.id,
+        email: user.email,
+        gender: user.gender,
+        firstname: user.firstname,
+        lastname: user.lastname,
+        image_url: user.image_url,
+        hobbies,
+        skills,
+      };
+    });
+
+    return usersWithHobbiesAndSkills;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 }
 
 //Update this method to complete challenge0.c and challenge1.b
