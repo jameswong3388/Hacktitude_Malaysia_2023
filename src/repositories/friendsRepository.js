@@ -10,8 +10,56 @@ function init(db) {
 
 //Update this method to complete challenge2.a
 async function getSuggestedFriends(userId) {
-  return [];
+  // Get the user's hobbies
+  const userHobbies = await knex_db('hobbies').where('userId', userId);
+
+  // Get all users
+  const users = await knex_db('users').whereNot('id', userId);
+
+  const suggestions = [];
+
+  for (const user of users) {
+    // Get each user's hobbies
+    const hobbies = await knex_db('hobbies').where('userId', user.id);
+    const skills = await knex_db('skills').where('userId', user.id);
+
+    let totalRateDifference = 0;
+    let sharedHobbies = 0;
+
+    for (const hobby of hobbies) {
+      // Find matching hobbies
+      const matchingHobby = userHobbies.find(uh => uh.name === hobby.name);
+
+      // If a matching hobby is found, calculate the rate difference
+      if (matchingHobby) {
+        totalRateDifference += Math.abs(matchingHobby.rate - hobby.rate);
+        sharedHobbies++;
+      }
+    }
+
+    // If the user shares at least one hobby with the current user
+    if (sharedHobbies > 0 && totalRateDifference > 0) {
+      // Check if the user is already a friend
+      const isFriend = await knex_db('friends').where(function () {
+        this.where('sender_id', userId).andWhere('recipient_id', user.id)
+          .orWhere('sender_id', user.id).andWhere('recipient_id', userId)
+      }).first();
+
+      // If the user is not a friend, add them to the suggestions list
+      if (!isFriend) {
+        suggestions.push({
+          ...user,
+          hobbies,
+          skills,
+        });
+      }
+    }
+  }
+
+  // Sort the suggestions by rate difference (ascending) and take the first 5
+  return suggestions.sort((a, b) => a.rateDifference - b.rateDifference).slice(0, 5);
 }
+
 
 //Update this method to complete challenge3.a, challenge3.b and challenge3.c
 async function sendReq(data) {
