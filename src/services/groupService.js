@@ -65,8 +65,7 @@ async function updateProjectStatus(projectId, data) {
 
 // Implement the method updateTaskStatusReq(taskId, status) for challenge 16 here
 async function updateTaskStatusReq(taskId, status) {
-    const details = status;
-    const response = groupRepository.updateTaskStatus(details, taskId);
+    const response = groupRepository.updateTaskStatus(taskId, status);
     return { response: response, status: httpStatus.OK };
 }
 
@@ -76,7 +75,9 @@ async function addNewProjectReq(projectDetails) {
 }
 
 async function addNewTaskReq(taskDetails) {
+    console.log(response);
     const response = await groupRepository.addNewTask(taskDetails);
+    
     return { response: response, status: httpStatus.OK };
 }
 // Implement this method for Challenge 5

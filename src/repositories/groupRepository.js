@@ -150,7 +150,26 @@ async function addNewProject(projectDetails) {
 }
 
 // Implement this method body for challenge 12
-async function addNewTask(taskDetails) {}
+async function addNewTask(taskDetails) {
+    const { name, taskDescription, assignee, reporterId, createdDate, dueDate, projectId, taskStatus } = taskDetails;
+  
+  return new Promise((resolve, reject) => {
+    knex_db
+      .raw(
+        `
+        INSERT INTO projects (name, description, assigneeId, reporterId, createdDate, dueDate, projectId, taskStatus)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `,
+        [name, taskDescription, assignee, reporterId, createdDate, dueDate, projectId, taskStatus]
+      )
+      .then((result) => {
+        resolve('success');
+      })
+      .catch((error) => {
+        reject(error);
+      });
+  });
+}
 
 // Implement this method for challenge 13
 async function updateProject(details, projectId) {
