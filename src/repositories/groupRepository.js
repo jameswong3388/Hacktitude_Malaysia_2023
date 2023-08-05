@@ -137,7 +137,25 @@ async function addNewProject(projectDetails) {
 async function addNewTask(taskDetails) {}
 
 // Implement this method for challenge 13
-async function updateProject(details, projectId) {}
+async function updateProject(details, projectId) {
+    const { projectName, projectDescription, endDate } = details;
+  
+    return new Promise((resolve, reject) => {
+      knex_db("projects")
+        .where({ id: projectId })
+        .update({
+          name: projectName,
+          description: projectDescription,
+          dueDate: endDate,
+        })
+        .then(() => {
+          resolve("success");
+        })
+        .catch((error) => {
+          reject(error);
+        });
+    });
+  }
 
 // Implement this method for challenge 14
 async function updateTask(details, taskId) {}
