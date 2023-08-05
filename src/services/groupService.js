@@ -47,11 +47,10 @@ async function updateProjectReq(details, projectId) {
 }
 
 // Implement the method updateTaskReq(details, taskId) for challenge 14 here
-//
-//
-//
-//
-//
+async function updateTaskReq(details, taskId) {
+    const response = await groupRepository.updateTask(details, taskId);
+    return { response: response, status: httpStatus.OK };
+}
 
 async function getProjectByIdReq(projectId) {
     const response = await groupRepository.getProjectById(projectId);
@@ -65,11 +64,11 @@ async function updateProjectStatus(projectId, data) {
 }
 
 // Implement the method updateTaskStatusReq(taskId, status) for challenge 16 here
-//
-//
-//
-//
-//
+async function updateTaskStatusReq(taskId, status) {
+    const details = status;
+    const response = groupRepository.updateTaskStatus(details, taskId);
+    return { response: response, status: httpStatus.OK };
+}
 
 async function addNewProjectReq(projectDetails) {
     const response = await groupRepository.addNewProject(projectDetails);
@@ -127,4 +126,6 @@ export default {
     addUserToGroup,
     updateProjectReq,
     updateProjectStatus,
+    updateTaskReq,
+    updateTaskStatusReq,
 };
