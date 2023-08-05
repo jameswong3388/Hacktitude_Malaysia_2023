@@ -44,14 +44,14 @@ async function getUsersOfGroupsReq(groupId) {
 async function updateProjectReq(details, projectId) {
     const response = await groupRepository.updateProject(details, projectId);
     return { response: response, status: httpStatus.OK };
-  }
+}
 
 // Implement the method updateTaskReq(details, taskId) for challenge 14 here
-//
-//
-//
-//
-//
+async function updateTaskReq(details, taskId) {
+    const response = await groupRepository.updateTask(details, taskId);
+    return { response: response, status: httpStatus.OK };
+}
+
 
 async function getProjectByIdReq(projectId) {
     const response = await groupRepository.getProjectById(projectId);
@@ -127,4 +127,5 @@ export default {
     addNewGroup,
     addUserToGroup,
     updateProjectReq,
+    updateTaskReq,
 };
